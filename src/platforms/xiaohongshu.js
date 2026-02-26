@@ -484,9 +484,90 @@ function createPanel() {
 }
 
 // 监听来自 background/popup 的消息
-chrome.runtime.onMessage.addListener((msg) => {
-    if (msg.type === 'SHOW_PANEL') createPanel();
+chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
+    if (msg.type === 'SHOW_PANEL') {
+        createPanel();
+        return;
+    }
+
+    // ===== 自动采集模式（由网站触发，background 转发） =====
+    if (msg.type === 'AUTO_COLLECT') {
+        const { action, keyword, count = 30, taskId } = msg;
+        (async () => {
+            try {
+                if (action === 'collect_search') {
+                    await autoCollectSearch({ keyword, count, taskId });
+                } else if (action === 'collect_author') {
+                    await collectAuthor(); // 账号页自动采集
+                }
+                chrome.runtime.sendMessage({ type: 'TASK_COMPLETE', taskId });
+            } catch (e) {
+                chrome.runtime.sendMessage({ type: 'TASK_COMPLETE', taskId, error: e.message });
+            }
+        })();
+        sendResponse({ ok: true });
+        return true;
+    }
+
+    if (msg.type === 'AUTO_COLLECT_KEYWORDS') {
+        createPanel();
+        setTimeout(() => collectDropdownKeywords(), 1000);
+        return;
+    }
 });
+
+// 自动采集搜索结果（无需用户交互的版本）
+async function autoCollectSearch({ keyword, count = 30, taskId }) {
+    // 等页面加载完毕
+    await sleep(2000);
+    const collected = new Map();
+    let lastSize = 0;
+    let stuckCount = 0;
+
+    while (collected.size < count) {
+        $$('.note-item').forEach((item) => {
+            const img = $('img', item);
+            const link = $('.cover.ld.mask', item) || $('a', item);
+            if (!img || !link) return;
+            const href = link.href || '';
+            if (collected.has(href)) return;
+            const noteId = href.match(/\/explore\/([^/?]+)/)?.[1] || '';
+            collected.set(href, {
+                noteId,
+                keyword,
+                title: item.querySelector('a.title')?.innerText?.trim() || '',
+                author: item.querySelector('.name')?.textContent?.trim() || '',
+                likes: parseCount(item.querySelector('.footer .count')?.textContent),
+                cover: img.src || '',
+                url: href,
+                taskId,
+            });
+        });
+
+        if (collected.size === lastSize) {
+            stuckCount++;
+            if (stuckCount > 4) break; // 连续 4 次没变化，停止
+        } else {
+            stuckCount = 0;
+            lastSize = collected.size;
+        }
+
+        window.scrollTo(0, document.body.scrollHeight);
+        await sleep(2500);
+    }
+
+    const result = Array.from(collected.values()).slice(0, count);
+    if (result.length) {
+        await apiPost('/plugin-video', {
+            platform: 'xiaohongshu',
+            type: 'search',
+            keyword,
+            taskId,
+            data: result,
+        });
+    }
+    return result;
+}
 
 // 自动显示面板
 setTimeout(createPanel, 1500);

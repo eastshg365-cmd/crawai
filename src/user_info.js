@@ -1,41 +1,83 @@
-// user_info.js: 注入到你的服务器网页，读 cookie 中的 token 存入 chrome.storage
-// 在 manifest.json 的 content_scripts 里配置 matches 为你的服务器域名
+// user_info.js
+// 1. 从网站 Cookie 读取 Supabase token 存入插件 storage
+// 2. 监听网站发送的采集指令，转发给 background
 
 (function () {
-    // 在网页上埋标记，表示插件已安装
+    // ===== 插件已安装标记 =====
     const marker = document.createElement('div');
-    marker.id = 'is_install_crawai_ext';
+    marker.id = 'crawai_ext_installed';
+    marker.dataset.version = '1.1.0';
     marker.style.display = 'none';
     document.body && document.body.appendChild(marker);
 
-    function parseCookies(cookieStr) {
-        if (!cookieStr) return {};
+    // 通知网站插件已就绪
+    window.postMessage({ type: 'CRAWAI_READY', version: '1.1.0' }, '*');
+
+    // ===== 从 Cookie 同步 token =====
+    function parseCookies() {
         const result = {};
-        cookieStr.split(';').forEach((part) => {
-            const [key, ...val] = part.trim().split('=');
-            if (key) result[key.trim()] = val.join('=');
+        document.cookie.split(';').forEach((part) => {
+            const [k, ...v] = part.trim().split('=');
+            if (k) result[k.trim()] = v.join('=');
         });
         return result;
     }
 
-    async function syncToken() {
-        try {
-            const cookies = parseCookies(document.cookie);
-            const token = cookies['token'];
-            if (token) {
-                chrome.storage.local.get(['token'], (res) => {
-                    if (res.token !== token) {
-                        chrome.storage.local.set({ token });
-                    }
-                });
-            }
-            // 2 秒后再次同步
-            setTimeout(syncToken, 2000);
-        } catch (e) {
-            setTimeout(syncToken, 2000);
-        }
-    }
+    function syncToken() {
+        const cookies = parseCookies();
+        // Supabase 的 access_token 通常以 sb-xxx-auth-token 存储，或直接 token
+        const token =
+            cookies['token'] ||
+            cookies['sb-access-token'] ||
+            Object.entries(cookies).find(([k]) => k.includes('auth-token'))?.[1];
 
-    // 延迟 1s 开始，等页面 cookie 设置完毕
-    setTimeout(syncToken, 1000);
+        if (token) {
+            chrome.storage.local.get(['token'], (res) => {
+                if (res.token !== token) {
+                    chrome.storage.local.set({ token });
+                    window.postMessage({ type: 'CRAWAI_TOKEN_SYNCED' }, '*');
+                }
+            });
+        }
+        setTimeout(syncToken, 2000);
+    }
+    setTimeout(syncToken, 500);
+
+    // ===== 监听来自网站的采集指令 =====
+    window.addEventListener('message', (event) => {
+        // 安全校验：只接受同页面消息
+        if (event.source !== window) return;
+        const msg = event.data;
+        if (!msg || !msg.type || !msg.type.startsWith('CRAWAI_')) return;
+
+        switch (msg.type) {
+            // 网站发送采集任务
+            case 'CRAWAI_TASK': {
+                // msg.payload: { action, keyword, count, platform, taskId }
+                chrome.runtime.sendMessage(
+                    { type: 'EXECUTE_TASK', payload: msg.payload },
+                    (response) => {
+                        window.postMessage({ type: 'CRAWAI_TASK_ACK', taskId: msg.payload?.taskId, response }, '*');
+                    }
+                );
+                break;
+            }
+            // 网站查询插件状态
+            case 'CRAWAI_PING': {
+                chrome.storage.local.get(['token'], (res) => {
+                    window.postMessage({
+                        type: 'CRAWAI_PONG',
+                        hasToken: !!res.token,
+                        version: '1.1.0',
+                    }, '*');
+                });
+                break;
+            }
+            // 网站要求退出登录
+            case 'CRAWAI_LOGOUT': {
+                chrome.storage.local.remove(['token']);
+                break;
+            }
+        }
+    });
 })();
