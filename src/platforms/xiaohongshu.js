@@ -447,6 +447,13 @@ function createPanel() {
             <span class="crawai-btn-desc">下载当前笔记视频到本地</span>
           </div>
         </button>
+        <button class="crawai-btn" id="xhs-keywords">
+          <span class="crawai-btn-icon">🔍</span>
+          <div class="crawai-btn-info">
+            <span class="crawai-btn-title">采集下拉词</span>
+            <span class="crawai-btn-desc">输入种子词，自动采集 A-Z 下拉联想词</span>
+          </div>
+        </button>
       </div>
     </div>
   `;
@@ -473,6 +480,7 @@ function createPanel() {
     panel.querySelector('#xhs-author').onclick = () => collectAuthor();
     panel.querySelector('#xhs-text').onclick = () => extractText();
     panel.querySelector('#xhs-download').onclick = () => downloadVideo();
+    panel.querySelector('#xhs-keywords').onclick = () => collectDropdownKeywords();
 }
 
 // 监听来自 background/popup 的消息
@@ -482,3 +490,120 @@ chrome.runtime.onMessage.addListener((msg) => {
 
 // 自动显示面板
 setTimeout(createPanel, 1500);
+
+// ===== 下拉词采集 =====
+async function collectDropdownKeywords() {
+    const seedWord = await new Promise((resolve, reject) => {
+        const mask = document.createElement('div');
+        mask.className = 'crawai-modal-mask';
+        mask.innerHTML = `
+        <div class="crawai-modal">
+          <h3>🔍 下拉词采集</h3>
+          <div class="crawai-form-item">
+            <label>种子关键词</label>
+            <input type="text" id="xhs_seed" placeholder="例如：私人定制护肤" style="font-size:14px;"/>
+            <div class="crawai-form-hint">插件会自动搜索「关键词 + a」~「关键词 + z」并汇总下拉联想词</div>
+          </div>
+          <div class="crawai-modal-footer">
+            <button class="crawai-action-btn ghost js-cancel">取消</button>
+            <button class="crawai-action-btn primary js-confirm">开始采集</button>
+          </div>
+        </div>`;
+        mask.querySelector('.js-cancel').onclick = () => { mask.remove(); reject(new Error('用户取消')); };
+        mask.querySelector('.js-confirm').onclick = () => {
+            const val = mask.querySelector('#xhs_seed').value.trim();
+            if (!val) { mask.querySelector('#xhs_seed').focus(); return; }
+            mask.remove();
+            resolve(val);
+        };
+        document.body.appendChild(mask);
+        setTimeout(() => mask.querySelector('#xhs_seed').focus(), 100);
+    }).catch(() => null);
+
+    if (!seedWord) return;
+
+    try { await checkPermission('XHS_Keyword_Collect'); } catch (e) {
+        toast(e.message || '权限验证失败，请先登录', 'error'); return;
+    }
+
+    // 找小红书搜索框
+    const searchInput = document.querySelector(
+        'input[placeholder*="搜索"], .search-input input, #search-input, input[type="search"], [class*="search"] input'
+    );
+    if (!searchInput) {
+        toast('未找到搜索框，请在小红书首页或搜索页使用此功能', 'error');
+        return;
+    }
+
+    const letters = 'abcdefghijklmnopqrstuvwxyz'.split('');
+    const results = {};
+    const progress = showProgress('采集下拉词中...');
+    progress.update(0, 26, `准备采集「${seedWord}」的下拉词...`);
+
+    // React/Vue 输入框需要用 nativeInputValueSetter 触发
+    const nativeSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value').set;
+
+    for (let i = 0; i < letters.length; i++) {
+        if (progress.canceled) break;
+        const letter = letters[i];
+        const query = `${seedWord} ${letter}`;
+
+        searchInput.focus();
+        nativeSetter.call(searchInput, query);
+        searchInput.dispatchEvent(new Event('input', { bubbles: true }));
+        searchInput.dispatchEvent(new KeyboardEvent('keyup', { bubbles: true }));
+
+        await sleep(1000); // 等下拉词渲染
+
+        // 兼容多种小红书下拉词容器
+        const suggestions = Array.from(document.querySelectorAll([
+            '[class*="suggest"] li',
+            '[class*="Suggest"] li',
+            '.search-suggest-item',
+            '[class*="hot-search"] li',
+            '[class*="search-list"] li',
+            '[data-testid="suggest-item"]',
+        ].join(', '))).map(el => el.textContent.trim()).filter(t => t && t.length < 50);
+
+        results[letter.toUpperCase()] = suggestions;
+        progress.update(i + 1, 26, `${letter.toUpperCase()} 完成（${suggestions.length} 个词）`);
+        await sleep(400);
+    }
+
+    // 收起搜索框
+    searchInput.blur();
+    document.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+
+    progress.remove();
+
+    // 上报服务器
+    try {
+        await apiPost('/plugin-keywords', {
+            seed: seedWord,
+            keywords: results,
+            collected_at: new Date().toISOString(),
+        });
+        toast('下拉词已同步到服务器 ✓', 'success');
+    } catch (e) {
+        console.warn('上报失败:', e);
+        toast('采集完成（服务器同步失败，请检查登录状态）', 'warning');
+    }
+
+    // 本地展示
+    const tableData = Object.entries(results).map(([letter, words]) => ({
+        字母: letter,
+        词数: words.length,
+        下拉词: words.join(' | '),
+    }));
+
+    showTable({
+        title: `「${seedWord}」下拉词采集结果`,
+        columns: [
+            { key: '字母', label: '字母' },
+            { key: '词数', label: '词数' },
+            { key: '下拉词', label: '下拉词（竖线分隔）' },
+        ],
+        data: tableData,
+    });
+}
+
