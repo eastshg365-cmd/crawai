@@ -1,6 +1,6 @@
 // Popup 逻辑：检查登录状态，渲染登录/退出按钮
 
-const SERVER_URL = 'http://localhost:3000';
+const SERVER_URL = 'https://truessence.cloud';
 
 async function getToken() {
     return new Promise((resolve) => {

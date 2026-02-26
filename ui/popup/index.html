@@ -1,183 +1,259 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
+
 <head>
-<meta charset="UTF-8"/>
-<title>采集助手</title>
-<style>
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body {
-  width: 360px;
-  min-height: 400px;
-  background: #0f0f1a;
-  font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', sans-serif;
-  color: #e0e0e0;
-}
+  <meta charset="UTF-8" />
+  <title>凯瑞莱AI智能营销</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
-/* 背景光球 */
-.bg-orb {
-  position: fixed;
-  border-radius: 50%;
-  filter: blur(60px);
-  opacity: 0.25;
-  pointer-events: none;
-}
-.orb-1 { width: 200px; height: 200px; background: #7856FF; top: -60px; right: -40px; }
-.orb-2 { width: 160px; height: 160px; background: #f441a5; bottom: 0; left: -40px; }
+    body {
+      width: 360px;
+      min-height: 400px;
+      background: #0f0f1a;
+      font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', sans-serif;
+      color: #e0e0e0;
+    }
 
-.header {
-  padding: 20px 18px 12px;
-  position: relative;
-  z-index: 1;
-}
-.logo-row { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
-.logo-icon {
-  width: 32px; height: 32px;
-  background: linear-gradient(135deg, #7856FF, #f441a5);
-  border-radius: 8px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 18px;
-}
-.app-name { font-size: 18px; font-weight: 700; color: #fff; }
-.subtitle { font-size: 12px; color: #888; }
+    /* 背景光球 */
+    .bg-orb {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(60px);
+      opacity: 0.25;
+      pointer-events: none;
+    }
 
-.platform-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
-  padding: 6px 12px 12px;
-  position: relative;
-  z-index: 1;
-}
-.platform-card {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-  padding: 14px 8px;
-  background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(255,255,255,0.08);
-  border-radius: 12px;
-  text-decoration: none;
-  color: #e0e0e0;
-  font-size: 13px;
-  transition: all 0.25s;
-  position: relative;
-  overflow: hidden;
-  animation: fadeUp 0.4s ease both;
-}
-.platform-card:hover {
-  border-color: #7856FF;
-  background: rgba(120,86,255,0.15);
-  transform: translateY(-2px);
-}
-.platform-icon { font-size: 26px; }
-@keyframes fadeUp {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
+    .orb-1 {
+      width: 200px;
+      height: 200px;
+      background: #7856FF;
+      top: -60px;
+      right: -40px;
+    }
 
-.divider {
-  height: 1px;
-  background: rgba(255,255,255,0.06);
-  margin: 0 12px;
-}
+    .orb-2 {
+      width: 160px;
+      height: 160px;
+      background: #f441a5;
+      bottom: 0;
+      left: -40px;
+    }
 
-.footer {
-  padding: 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  position: relative;
-  z-index: 1;
-}
-.btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  padding: 10px;
-  border-radius: 8px;
-  border: none;
-  cursor: pointer;
-  font-size: 13px;
-  font-weight: 500;
-  text-decoration: none;
-  transition: all 0.2s;
-}
-.btn-primary {
-  background: linear-gradient(135deg, #7856FF, #5b3fd0);
-  color: #fff;
-}
-.btn-primary:hover { filter: brightness(1.15); }
-.btn-danger {
-  background: rgba(239,68,68,0.08);
-  border: 1px solid rgba(239,68,68,0.2);
-  color: #ef4444;
-}
-.btn-danger:hover { background: rgba(239,68,68,0.15); }
-.btn-ghost {
-  background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(255,255,255,0.08);
-  color: #888;
-}
-.btn-ghost:hover { background: rgba(255,255,255,0.08); color: #fff; }
+    .header {
+      padding: 20px 18px 12px;
+      position: relative;
+      z-index: 1;
+    }
 
-.login-hint {
-  text-align: center;
-  font-size: 12px;
-  color: #555;
-  padding: 4px 0;
-}
+    .logo-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 4px;
+    }
 
-.status-dot {
-  display: inline-block;
-  width: 6px; height: 6px;
-  border-radius: 50%;
-  margin-right: 6px;
-}
-.status-dot.online { background: #22c55e; box-shadow: 0 0 6px #22c55e; }
-.status-dot.offline { background: #555; }
-</style>
+    .logo-icon {
+      width: 32px;
+      height: 32px;
+      background: linear-gradient(135deg, #7856FF, #f441a5);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+    }
+
+    .app-name {
+      font-size: 18px;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .subtitle {
+      font-size: 12px;
+      color: #888;
+    }
+
+    .platform-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      padding: 6px 12px 12px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .platform-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      padding: 14px 8px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+      text-decoration: none;
+      color: #e0e0e0;
+      font-size: 13px;
+      transition: all 0.25s;
+      position: relative;
+      overflow: hidden;
+      animation: fadeUp 0.4s ease both;
+    }
+
+    .platform-card:hover {
+      border-color: #7856FF;
+      background: rgba(120, 86, 255, 0.15);
+      transform: translateY(-2px);
+    }
+
+    .platform-icon {
+      font-size: 26px;
+    }
+
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .divider {
+      height: 1px;
+      background: rgba(255, 255, 255, 0.06);
+      margin: 0 12px;
+    }
+
+    .footer {
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 10px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 500;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #7856FF, #5b3fd0);
+      color: #fff;
+    }
+
+    .btn-primary:hover {
+      filter: brightness(1.15);
+    }
+
+    .btn-danger {
+      background: rgba(239, 68, 68, 0.08);
+      border: 1px solid rgba(239, 68, 68, 0.2);
+      color: #ef4444;
+    }
+
+    .btn-danger:hover {
+      background: rgba(239, 68, 68, 0.15);
+    }
+
+    .btn-ghost {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: #888;
+    }
+
+    .btn-ghost:hover {
+      background: rgba(255, 255, 255, 0.08);
+      color: #fff;
+    }
+
+    .login-hint {
+      text-align: center;
+      font-size: 12px;
+      color: #555;
+      padding: 4px 0;
+    }
+
+    .status-dot {
+      display: inline-block;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      margin-right: 6px;
+    }
+
+    .status-dot.online {
+      background: #22c55e;
+      box-shadow: 0 0 6px #22c55e;
+    }
+
+    .status-dot.offline {
+      background: #555;
+    }
+  </style>
 </head>
+
 <body>
-<div class="bg-orb orb-1"></div>
-<div class="bg-orb orb-2"></div>
+  <div class="bg-orb orb-1"></div>
+  <div class="bg-orb orb-2"></div>
 
-<div class="header">
-  <div class="logo-row">
-    <div class="logo-icon">🕷️</div>
-    <span class="app-name">采集助手</span>
+  <div class="header">
+    <div class="logo-row">
+      <div class="logo-icon">🕷️</div>
+      <span class="app-name">凯瑞莱AI营销</span>
+    </div>
+    <div class="subtitle">AI 驱动多平台数据采集</div>
   </div>
-  <div class="subtitle">AI 驱动多平台数据采集</div>
-</div>
 
-<div class="platform-grid" id="platformGrid">
-  <a class="platform-card" href="https://www.bilibili.com/" target="bilibili" style="animation-delay:0s">
-    <span class="platform-icon">📺</span><span>B站视频</span>
-  </a>
-  <a class="platform-card" href="https://www.douyin.com/" target="dylist" style="animation-delay:0.08s">
-    <span class="platform-icon">🎵</span><span>抖音视频</span>
-  </a>
-  <a class="platform-card" href="https://www.tiktok.com/foryou" target="tk" style="animation-delay:0.16s">
-    <span class="platform-icon">🌐</span><span>TikTok</span>
-  </a>
-  <a class="platform-card" href="https://www.xiaohongshu.com" target="xhs" style="animation-delay:0.24s">
-    <span class="platform-icon">📖</span><span>小红书</span>
-  </a>
-  <a class="platform-card" href="https://www.kuaishou.com" target="ks" style="animation-delay:0.32s">
-    <span class="platform-icon">⚡</span><span>快手视频</span>
-  </a>
-  <a class="platform-card" href="https://www.youtube.com/" target="yt" style="animation-delay:0.40s">
-    <span class="platform-icon">▶️</span><span>YouTube</span>
-  </a>
-</div>
+  <div class="platform-grid" id="platformGrid">
+    <a class="platform-card" href="https://www.bilibili.com/" target="bilibili" style="animation-delay:0s">
+      <span class="platform-icon">📺</span><span>B站视频</span>
+    </a>
+    <a class="platform-card" href="https://www.douyin.com/" target="dylist" style="animation-delay:0.08s">
+      <span class="platform-icon">🎵</span><span>抖音视频</span>
+    </a>
+    <a class="platform-card" href="https://www.tiktok.com/foryou" target="tk" style="animation-delay:0.16s">
+      <span class="platform-icon">🌐</span><span>TikTok</span>
+    </a>
+    <a class="platform-card" href="https://www.xiaohongshu.com" target="xhs" style="animation-delay:0.24s">
+      <span class="platform-icon">📖</span><span>小红书</span>
+    </a>
+    <a class="platform-card" href="https://www.kuaishou.com" target="ks" style="animation-delay:0.32s">
+      <span class="platform-icon">⚡</span><span>快手视频</span>
+    </a>
+    <a class="platform-card" href="https://www.youtube.com/" target="yt" style="animation-delay:0.40s">
+      <span class="platform-icon">▶️</span><span>YouTube</span>
+    </a>
+  </div>
 
-<div class="divider"></div>
+  <div class="divider"></div>
 
-<div class="footer" id="footer">
-  <!-- 动态渲染 -->
-</div>
+  <div class="footer" id="footer">
+    <!-- 动态渲染 -->
+  </div>
 
-<script src="popup.js"></script>
+  <script src="popup.js"></script>
 </body>
+
 </html>

@@ -1,7 +1,7 @@
 // 抖音采集 Content Script
 // 功能：视频列表采集 / 账号主页采集 / 文案提取 / 视频文字转写
 
-const BASE_URL = 'http://localhost:3000/api';
+const BASE_URL = 'https://truessence.cloud/api';
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const $ = (sel, root = document) => root.querySelector(sel);

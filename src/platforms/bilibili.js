@@ -1,5 +1,5 @@
 // B站采集 Content Script
-const BASE_URL = 'http://localhost:3000/api';
+const BASE_URL = 'https://truessence.cloud/api';
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
 const parseCount = (str) => {

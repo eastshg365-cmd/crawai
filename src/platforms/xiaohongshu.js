@@ -1,7 +1,7 @@
 // 小红书采集 Content Script
 // 功能：搜索结果采集 / 账号主页采集 / 视频文案提取 / 视频下载
 
-const BASE_URL = 'http://localhost:3000/api';
+const BASE_URL = 'https://truessence.cloud/api';
 
 // ===== 工具函数 =====
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
