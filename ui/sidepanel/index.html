@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>凯瑞莱AI智能营销</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: #0f0f1a;
+            color: #e0e0e0;
+            font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            padding: 16px;
+            background: linear-gradient(135deg, #7856FF, #5b3fd0);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header img {
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            object-fit: cover;
+        }
+
+        .header-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .body {
+            flex: 1;
+            padding: 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .tip {
+            background: rgba(120, 86, 255, 0.1);
+            border: 1px solid rgba(120, 86, 255, 0.25);
+            border-radius: 8px;
+            padding: 12px;
+            font-size: 12px;
+            color: #a088ff;
+            line-height: 1.7;
+        }
+
+        .section-title {
+            font-size: 12px;
+            color: #555;
+            margin: 4px 0 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .platform-list {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .platform-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 12px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            border-radius: 8px;
+            text-decoration: none;
+            color: #e0e0e0;
+            font-size: 13px;
+            transition: all 0.2s;
+        }
+
+        .platform-item:hover {
+            border-color: #7856FF;
+            background: rgba(120, 86, 255, 0.1);
+        }
+
+        .platform-icon {
+            font-size: 18px;
+        }
+
+        .status-bar {
+            padding: 10px 14px;
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 11px;
+            color: #555;
+        }
+
+        .dot {
+            display: inline-block;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            margin-right: 5px;
+        }
+
+        .dot.on {
+            background: #22c55e;
+            box-shadow: 0 0 5px #22c55e;
+        }
+
+        .dot.off {
+            background: #444;
+        }
+
+        .logout-btn {
+            background: none;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #ef4444;
+            padding: 3px 10px;
+            border-radius: 5px;
+            font-size: 11px;
+            cursor: pointer;
+        }
+
+        .logout-btn:hover {
+            background: rgba(239, 68, 68, 0.1);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="header">
+        <img src="../../src/assets/icon128.png" alt="logo" />
+        <span class="header-title">凯瑞莱AI智能营销</span>
+    </div>
+
+    <div class="body">
+        <div class="tip">
+            📌 打开对应平台网页后，页面右侧会自动出现采集悬浮面板。<br />
+            请先确保已登录，方可使用采集功能。
+        </div>
+
+        <div class="section-title">快速跳转平台</div>
+        <div class="platform-list">
+            <a class="platform-item" href="https://www.xiaohongshu.com" target="_blank"><span
+                    class="platform-icon">📖</span>小红书</a>
+            <a class="platform-item" href="https://www.douyin.com" target="_blank"><span
+                    class="platform-icon">🎵</span>抖音</a>
+            <a class="platform-item" href="https://www.bilibili.com" target="_blank"><span
+                    class="platform-icon">📺</span>B站</a>
+            <a class="platform-item" href="https://www.kuaishou.com" target="_blank"><span
+                    class="platform-icon">⚡</span>快手</a>
+            <a class="platform-item" href="https://www.youtube.com" target="_blank"><span
+                    class="platform-icon">▶️</span>YouTube</a>
+            <a class="platform-item" href="https://www.tiktok.com" target="_blank"><span
+                    class="platform-icon">🌐</span>TikTok</a>
+        </div>
+    </div>
+
+    <div class="status-bar" id="statusBar">
+        <span id="loginStatus"><span class="dot off"></span>未登录</span>
+        <button class="logout-btn" id="logoutBtn" style="display:none">退出</button>
+        <a href="https://truessence.cloud" target="_blank" style="color:#7856FF;font-size:11px;text-decoration:none;">官网
+            →</a>
+    </div>
+
+    <script>
+        function checkToken() {
+            chrome.storage.local.get(['token'], (res) => {
+                const dot = document.querySelector('.dot');
+                const statusEl = document.getElementById('loginStatus');
+                const logoutBtn = document.getElementById('logoutBtn');
+                if (res.token) {
+                    dot.className = 'dot on';
+                    statusEl.innerHTML = '<span class="dot on"></span>已登录';
+                    logoutBtn.style.display = 'inline-block';
+                } else {
+                    dot.className = 'dot off';
+                    statusEl.innerHTML = '<span class="dot off"></span>未登录';
+                    logoutBtn.style.display = 'none';
+                }
+            });
+        }
+
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            chrome.storage.local.remove(['token'], checkToken);
+        });
+
+        chrome.storage.onChanged.addListener(checkToken);
+        checkToken();
+    </script>
+</body>
+
+</html>
