@@ -1,7 +1,7 @@
 // 小红书采集 Content Script
 // 功能：搜索结果采集 / 账号主页采集 / 视频文案提取 / 视频下载
 
-const BASE_URL = 'https://truessence.cloud/api';
+const BASE_URL = 'https://aopysfqkewxmmunhdioz.supabase.co/functions/v1';
 
 // ===== 工具函数 =====
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -153,7 +153,7 @@ function showTable({ title, columns, data }) {
 
 // ===== 权限验证 =====
 async function checkPermission(funcName) {
-    const data = await apiPost(`/ai/func/${funcName}`, {});
+    const data = await apiPost('/plugin-auth', { funcName });
     return data;
 }
 
@@ -227,7 +227,7 @@ async function collectSearch() {
 
     // 上报给服务器
     try {
-        await apiPost('/ai/chrome_video/modify_add', { platform: 'xiaohongshu', type: 'search', data: result });
+        await apiPost('/plugin-video', { platform: 'xiaohongshu', type: 'search', data: result });
     } catch (e) { console.warn('上报失败:', e); }
 
     const keyword = new URLSearchParams(location.search).get('keyword') || '';
@@ -297,7 +297,7 @@ async function collectAuthor() {
     toast(`采集完成，共 ${result.length} 条`, 'success');
 
     try {
-        await apiPost('/ai/chrome_author/modify_add', { platform: 'xiaohongshu', author: authorName, data: result });
+        await apiPost('/plugin-author', { platform: 'xiaohongshu', author: authorName, data: result });
     } catch (e) { console.warn('上报失败:', e); }
 
     showTable({

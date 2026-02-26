@@ -1,5 +1,5 @@
 // TikTok 采集 Content Script
-const BASE_URL = 'https://truessence.cloud/api';
+const BASE_URL = 'https://aopysfqkewxmmunhdioz.supabase.co/functions/v1';
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
 const parseCount = (str) => {
@@ -61,7 +61,7 @@ async function collectVideos() {
     if (countStr === null) return;
     const count = parseInt(countStr) || 30;
 
-    try { await apiPost('/ai/func/TK_Video_Collect', {}); } catch (e) { toast(e.message || 'Auth failed, please login', 'error'); return; }
+    try { await apiPost('/plugin-auth', { funcName: 'TK_Video_Collect' }); } catch (e) { toast(e.message || 'Auth failed, please login', 'error'); return; }
 
     const progress = showProgress('Collecting TikTok videos...');
     const collected = new Map();
@@ -87,7 +87,7 @@ async function collectVideos() {
     const result = Array.from(collected.values()).slice(0, count);
     if (!result.length) { toast('No videos found', 'warning'); return; }
     toast(`Done! Collected ${result.length} videos`, 'success');
-    try { await apiPost('/ai/chrome_video/modify_add', { platform: 'tiktok', data: result }); } catch { }
+    try { await apiPost('/plugin-video', { platform: 'tiktok', data: result }); } catch { }
     showTable('TikTok Videos', result);
 }
 

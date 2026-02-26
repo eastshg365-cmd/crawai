@@ -25,6 +25,7 @@
                 "src/user_info.js"
             ],
             "matches": [
+                "https://sparkler-marketing-ai.lovable.app/*",
                 "https://truessence.cloud/*",
                 "http://localhost:3000/*"
             ],

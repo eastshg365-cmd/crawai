@@ -1,7 +1,7 @@
 // 抖音采集 Content Script
 // 功能：视频列表采集 / 账号主页采集 / 文案提取 / 视频文字转写
 
-const BASE_URL = 'https://truessence.cloud/api';
+const BASE_URL = 'https://aopysfqkewxmmunhdioz.supabase.co/functions/v1';
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const $ = (sel, root = document) => root.querySelector(sel);
@@ -105,7 +105,7 @@ async function collectList() {
     try { settings = await showSettings([{ key: 'count', label: '采集数量', default: 30, min: 1, max: 500 }]); }
     catch { return; }
 
-    try { await apiPost('/ai/func/DY_List_Collect', {}); } catch (e) {
+    try { await apiPost('/plugin-auth', { funcName: 'DY_List_Collect' }); } catch (e) {
         toast(e.message || '权限验证失败', 'error'); return;
     }
 
@@ -144,7 +144,7 @@ async function collectList() {
     if (!result.length) { toast('未采集到数据', 'warning'); return; }
 
     toast(`采集完成，共 ${result.length} 条`, 'success');
-    try { await apiPost('/ai/chrome_video/modify_add', { platform: 'douyin', data: result }); } catch { }
+    try { await apiPost('/plugin-video', { platform: 'douyin', data: result }); } catch { }
 
     showTable('抖音视频', [
         { key: '标题', label: '标题' },
@@ -163,7 +163,7 @@ async function collectAuthor() {
     try { settings = await showSettings([{ key: 'count', label: '采集数量', default: 20, min: 1, max: 200 }]); }
     catch { return; }
 
-    try { await apiPost('/ai/func/DY_Author_Collect', {}); } catch (e) {
+    try { await apiPost('/plugin-auth', { funcName: 'DY_Author_Collect' }); } catch (e) {
         toast(e.message || '权限验证失败', 'error'); return;
     }
 

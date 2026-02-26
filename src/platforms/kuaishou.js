@@ -1,5 +1,5 @@
 // 快手采集 Content Script
-const BASE_URL = 'https://truessence.cloud/api';
+const BASE_URL = 'https://aopysfqkewxmmunhdioz.supabase.co/functions/v1';
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
 const parseCount = (str) => {
@@ -60,7 +60,7 @@ async function collectVideos() {
     if (countStr === null) return;
     const count = parseInt(countStr) || 30;
 
-    try { await apiPost('/ai/func/KS_Video_Collect', {}); } catch (e) { toast(e.message || '权限验证失败', 'error'); return; }
+    try { await apiPost('/plugin-auth', { funcName: 'KS_Video_Collect' }); } catch (e) { toast(e.message || '权限验证失败', 'error'); return; }
 
     const progress = showProgress('采集快手数据中...');
     const collected = new Map();
@@ -88,7 +88,7 @@ async function collectVideos() {
     const result = Array.from(collected.values()).slice(0, count);
     if (!result.length) { toast('未采集到数据', 'warning'); return; }
     toast(`采集完成，共 ${result.length} 条`, 'success');
-    try { await apiPost('/ai/chrome_video/modify_add', { platform: 'kuaishou', data: result }); } catch { }
+    try { await apiPost('/plugin-video', { platform: 'kuaishou', data: result }); } catch { }
     showTable('快手视频', result);
 }
 
