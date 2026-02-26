@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>采集助手 - 设置</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: #0f0f1a;
+            color: #e0e0e0;
+            font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', sans-serif;
+            min-height: 100vh;
+            padding: 40px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-size: 24px;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            color: #888;
+            font-size: 14px;
+            margin-bottom: 32px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 20px;
+        }
+
+        .card h2 {
+            font-size: 16px;
+            font-weight: 600;
+            color: #7856FF;
+            margin-bottom: 16px;
+        }
+
+        .form-item {
+            margin-bottom: 16px;
+        }
+
+        label {
+            display: block;
+            font-size: 12px;
+            color: #888;
+            margin-bottom: 6px;
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 10px 12px;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: #e0e0e0;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        input:focus,
+        select:focus {
+            border-color: #7856FF;
+        }
+
+        .hint {
+            font-size: 11px;
+            color: #555;
+            margin-top: 4px;
+        }
+
+        .btn {
+            padding: 10px 24px;
+            border-radius: 8px;
+            border: none;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #7856FF, #5b3fd0);
+            color: #fff;
+        }
+
+        .btn-primary:hover {
+            filter: brightness(1.15);
+        }
+
+        .status {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            margin-left: 10px;
+        }
+
+        .status.ok {
+            background: rgba(34, 197, 94, 0.15);
+            color: #22c55e;
+        }
+
+        .status.err {
+            background: rgba(239, 68, 68, 0.15);
+            color: #ef4444;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>⚙️ 插件设置</h1>
+        <p class="subtitle">配置服务器地址和采集参数</p>
+
+        <div class="card">
+            <h2>🌐 服务器配置</h2>
+            <div class="form-item">
+                <label>API 服务器地址</label>
+                <input id="serverUrl" type="url" placeholder="http://localhost:3000/api" />
+                <div class="hint">插件将向此地址发送采集数据和权限验证请求</div>
+            </div>
+            <div class="form-item">
+                <label>当前 Token 状态</label>
+                <div style="display:flex;align-items:center;gap:8px;padding:10px 0;">
+                    <span id="tokenStatus" class="status err">未登录</span>
+                    <span id="tokenValue" style="font-size:11px;color:#444;font-family:monospace;"></span>
+                    <button class="btn"
+                        style="padding:4px 12px;font-size:12px;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.2);color:#ef4444;border-radius:6px;"
+                        onclick="clearToken()">清除 Token</button>
+                </div>
+            </div>
+            <button class="btn btn-primary" onclick="saveSettings()">保存设置</button>
+            <span id="saveMsg" style="font-size:12px;color:#22c55e;margin-left:12px;"></span>
+        </div>
+
+        <div class="card">
+            <h2>📋 关于</h2>
+            <p style="font-size:13px;color:#888;line-height:1.8;">
+                采集助手 v1.0.0<br />
+                支持平台：小红书、抖音、B站、快手、YouTube、TikTok<br />
+                <a href="https://github.com/eastshg365-cmd/crawai" target="_blank" style="color:#7856FF;">GitHub 仓库</a>
+            </p>
+        </div>
+    </div>
+    <script>
+        function loadSettings() {
+            chrome.storage.local.get(['serverUrl', 'token'], (res) => {
+                if (res.serverUrl) document.getElementById('serverUrl').value = res.serverUrl;
+                const tokenEl = document.getElementById('tokenStatus');
+                const tokenValEl = document.getElementById('tokenValue');
+                if (res.token) {
+                    tokenEl.textContent = '已登录';
+                    tokenEl.className = 'status ok';
+                    tokenValEl.textContent = res.token.slice(0, 20) + '...';
+                } else {
+                    tokenEl.textContent = '未登录';
+                    tokenEl.className = 'status err';
+                    tokenValEl.textContent = '';
+                }
+            });
+        }
+
+        function saveSettings() {
+            const url = document.getElementById('serverUrl').value.trim();
+            chrome.storage.local.set({ serverUrl: url }, () => {
+                const msg = document.getElementById('saveMsg');
+                msg.textContent = '✓ 已保存';
+                setTimeout(() => msg.textContent = '', 2000);
+            });
+        }
+
+        function clearToken() {
+            chrome.storage.local.remove(['token'], loadSettings);
+        }
+
+        loadSettings();
+    </script>
+</body>
+
+</html>

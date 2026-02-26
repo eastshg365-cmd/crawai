@@ -1,0 +1,282 @@
+/* 采集面板通用样式 */
+
+:root {
+  --primary: #7856FF;
+  --primary-light: #9c7fff;
+  --success: #22c55e;
+  --danger: #ef4444;
+  --warning: #f59e0b;
+  --bg: #1a1a2e;
+  --card: #16213e;
+  --border: rgba(255,255,255,0.1);
+  --text: #e0e0e0;
+  --text-muted: #888;
+  --radius: 10px;
+  --shadow: 0 8px 32px rgba(0,0,0,0.4);
+}
+
+/* 浮动面板根容器 */
+.crawai-panel {
+  all: initial;
+  position: fixed;
+  top: 80px;
+  right: 20px;
+  width: 340px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', sans-serif;
+  font-size: 14px;
+  color: var(--text);
+  z-index: 999999;
+  overflow: hidden;
+  user-select: none;
+}
+
+.crawai-panel * { box-sizing: border-box; }
+
+.crawai-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background: linear-gradient(135deg, var(--primary), #5b3fd0);
+  font-weight: 600;
+  font-size: 15px;
+  cursor: move;
+}
+
+.crawai-panel-header .title { color: #fff; }
+
+.crawai-panel-close {
+  width: 24px;
+  height: 24px;
+  background: rgba(255,255,255,0.15);
+  border: none;
+  border-radius: 50%;
+  color: #fff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  transition: background 0.2s;
+}
+.crawai-panel-close:hover { background: rgba(255,255,255,0.3); }
+
+.crawai-panel-body { padding: 12px; }
+
+/* 功能按钮列表 */
+.crawai-btn-list { display: flex; flex-direction: column; gap: 8px; }
+
+.crawai-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 13px;
+}
+.crawai-btn:hover {
+  border-color: var(--primary);
+  background: rgba(120,86,255,0.1);
+  transform: translateY(-1px);
+}
+.crawai-btn-icon { font-size: 20px; }
+.crawai-btn-info { display: flex; flex-direction: column; gap: 2px; text-align: left; }
+.crawai-btn-title { font-weight: 600; color: #fff; font-size: 13px; }
+.crawai-btn-desc { color: var(--text-muted); font-size: 11px; }
+
+/* Toast 提示 */
+.crawai-toast {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%) translateY(-60px);
+  max-width: 320px;
+  padding: 10px 18px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  z-index: 10000000;
+  transition: transform 0.3s ease;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+  pointer-events: none;
+  white-space: nowrap;
+}
+.crawai-toast.show { transform: translateX(-50%) translateY(0); }
+.crawai-toast.success { background: var(--success); color: #fff; }
+.crawai-toast.error { background: var(--danger); color: #fff; }
+.crawai-toast.info { background: var(--primary); color: #fff; }
+.crawai-toast.warning { background: var(--warning); color: #fff; }
+
+/* 进度弹窗 */
+.crawai-progress-mask {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  z-index: 9999998;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.crawai-progress-box {
+  background: var(--bg);
+  border-radius: var(--radius);
+  padding: 24px 30px;
+  width: 280px;
+  text-align: center;
+  border: 1px solid var(--border);
+}
+.crawai-progress-title { font-size: 15px; font-weight: 600; color: #fff; margin-bottom: 16px; }
+.crawai-progress-msg { color: var(--text-muted); font-size: 13px; margin-bottom: 16px; }
+.crawai-progress-bar-wrap {
+  height: 6px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+.crawai-progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary), var(--primary-light));
+  border-radius: 3px;
+  transition: width 0.3s;
+  animation: progress-shimmer 1.5s infinite;
+}
+@keyframes progress-shimmer {
+  0% { filter: brightness(1); }
+  50% { filter: brightness(1.3); }
+  100% { filter: brightness(1); }
+}
+.crawai-progress-count { color: var(--primary); font-weight: 600; font-size: 13px; }
+.crawai-btn-cancel {
+  margin-top: 14px;
+  padding: 6px 18px;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 12px;
+  transition: all 0.2s;
+}
+.crawai-btn-cancel:hover { background: rgba(255,255,255,0.15); color: #fff; }
+
+/* 数据表格弹窗 */
+.crawai-table-mask {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  z-index: 9999999;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 20px;
+  overflow-y: auto;
+}
+.crawai-table-box {
+  background: var(--bg);
+  border-radius: var(--radius);
+  width: 100%;
+  max-width: 1000px;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+}
+.crawai-table-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+}
+.crawai-table-title { font-size: 16px; font-weight: 700; color: #fff; }
+.crawai-table-actions { display: flex; gap: 8px; }
+.crawai-action-btn {
+  padding: 6px 14px;
+  border-radius: 6px;
+  border: none;
+  font-size: 12px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+.crawai-action-btn.primary { background: var(--primary); color: #fff; }
+.crawai-action-btn.primary:hover { background: var(--primary-light); }
+.crawai-action-btn.ghost {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+}
+.crawai-action-btn.ghost:hover { border-color: var(--primary); color: #fff; }
+
+.crawai-table-wrap { overflow-x: auto; max-height: 70vh; }
+table.crawai-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+table.crawai-table th {
+  position: sticky;
+  top: 0;
+  background: var(--card);
+  color: var(--text-muted);
+  font-weight: 600;
+  padding: 10px 12px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+table.crawai-table td {
+  padding: 9px 12px;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  color: var(--text);
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+table.crawai-table tr:hover td { background: rgba(255,255,255,0.03); }
+table.crawai-table td a { color: var(--primary-light); text-decoration: none; }
+table.crawai-table td a:hover { text-decoration: underline; }
+
+/* 设置弹窗 */
+.crawai-modal-mask {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  z-index: 9999997;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.crawai-modal {
+  background: var(--bg);
+  border-radius: var(--radius);
+  padding: 24px;
+  width: 360px;
+  border: 1px solid var(--border);
+}
+.crawai-modal h3 { color: #fff; font-size: 16px; margin: 0 0 20px; }
+.crawai-form-item { margin-bottom: 14px; }
+.crawai-form-item label { display: block; color: var(--text-muted); font-size: 12px; margin-bottom: 6px; }
+.crawai-form-item input {
+  width: 100%;
+  padding: 8px 12px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+  font-size: 13px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.crawai-form-item input:focus { border-color: var(--primary); }
+.crawai-form-hint { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+.crawai-modal-footer { display: flex; gap: 8px; justify-content: flex-end; margin-top: 20px; }

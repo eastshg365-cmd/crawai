@@ -1,0 +1,137 @@
+{
+    "manifest_version": 3,
+    "name": "采集助手",
+    "description": "支持小红书、抖音、B站、快手、YouTube、TikTok 数据采集",
+    "version": "1.0.0",
+    "action": {
+        "default_popup": "ui/popup/index.html",
+        "default_icon": {
+            "16": "src/assets/icon16.png",
+            "32": "src/assets/icon32.png",
+            "128": "src/assets/icon128.png"
+        }
+    },
+    "background": {
+        "service_worker": "background.js",
+        "type": "module"
+    },
+    "side_panel": {
+        "default_path": "ui/sidepanel/index.html"
+    },
+    "options_page": "ui/options/index.html",
+    "content_scripts": [
+        {
+            "js": [
+                "src/user_info.js"
+            ],
+            "matches": [
+                "http://localhost:3000/*",
+                "https://localhost:3000/*"
+            ],
+            "run_at": "document_idle"
+        },
+        {
+            "js": [
+                "src/platforms/xiaohongshu.js"
+            ],
+            "matches": [
+                "https://www.xiaohongshu.com/*"
+            ],
+            "run_at": "document_end",
+            "css": [
+                "ui/common/panel.css"
+            ]
+        },
+        {
+            "js": [
+                "src/platforms/douyin.js"
+            ],
+            "matches": [
+                "https://www.douyin.com/*"
+            ],
+            "run_at": "document_end",
+            "css": [
+                "ui/common/panel.css"
+            ]
+        },
+        {
+            "js": [
+                "src/platforms/bilibili.js"
+            ],
+            "matches": [
+                "https://*.bilibili.com/*"
+            ],
+            "run_at": "document_end",
+            "css": [
+                "ui/common/panel.css"
+            ]
+        },
+        {
+            "js": [
+                "src/platforms/kuaishou.js"
+            ],
+            "matches": [
+                "https://www.kuaishou.com/*"
+            ],
+            "run_at": "document_end",
+            "css": [
+                "ui/common/panel.css"
+            ]
+        },
+        {
+            "js": [
+                "src/platforms/youtube.js"
+            ],
+            "matches": [
+                "https://www.youtube.com/*"
+            ],
+            "run_at": "document_end",
+            "css": [
+                "ui/common/panel.css"
+            ]
+        },
+        {
+            "js": [
+                "src/platforms/tiktok.js"
+            ],
+            "matches": [
+                "https://www.tiktok.com/*"
+            ],
+            "run_at": "document_end",
+            "css": [
+                "ui/common/panel.css"
+            ]
+        }
+    ],
+    "content_security_policy": {
+        "extension_pages": "script-src 'self'; object-src 'self';"
+    },
+    "permissions": [
+        "storage",
+        "tabs",
+        "sidePanel",
+        "downloads",
+        "activeTab",
+        "clipboardWrite",
+        "scripting"
+    ],
+    "host_permissions": [
+        "<all_urls>"
+    ],
+    "web_accessible_resources": [
+        {
+            "matches": [
+                "<all_urls>"
+            ],
+            "resources": [
+                "libs/xlsx.mini.js",
+                "ui/common/panel.css"
+            ]
+        }
+    ],
+    "icons": {
+        "16": "src/assets/icon16.png",
+        "32": "src/assets/icon32.png",
+        "128": "src/assets/icon128.png"
+    }
+}
